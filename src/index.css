@@ -1,0 +1,52 @@
+body {
+  background-color:rgb(219, 219, 219)
+}
+
+.container {
+  width: 500px;
+}
+
+.title {
+  text-align: center;
+  font-size:3rem;
+  margin: 20px 0px;
+    
+}
+
+.panel {
+  background-color: rgb(228, 228, 228);
+  border: 1px solid black;
+  height: 130px;
+}
+
+.calculationInput {
+    font-size: 3.5rem;
+    margin-bottom: 10px;
+    margin-right: 21px;
+    font-weight: 500;
+    text-align: right;
+}
+
+.calculationResult {
+  font-size:2.1rem;
+  margin-bottom:10px;
+  margin-right:20px;
+  font-weight: 500;
+  text-align: right;
+}
+
+.numberPad {
+  display: flex;
+  flex-wrap:wrap;
+  height: 500px;
+  margin-top: 10px;
+}
+
+.button {
+  border: 1px solid black;
+  margin:2.5px;
+  width: 95px;
+  text-align: center;
+  font-size: 2.5rem;
+
+}
