@@ -101,23 +101,62 @@ numberPad.addEventListener('click', function numberPadClicked(event) {
       calculationResult.textContent = ''
     }
   }
-
-  //計算
-  function calculation() {
-    console.log('do calculation')
-    if (inputList[1] === '+') {
-      result = Number(inputList[0]) + Number(inputList[2])
-    }
-    if (inputList[1] === '-') {
-      result = Number(inputList[0]) - Number(inputList[2])
-    }
-    if (inputList[1] === '*') {
-      result = Number(inputList[0]) * Number(inputList[2])
-    }
-    if (inputList[1] === '/') {
-      result = Number(inputList[0]) / Number(inputList[2])
-    }
-    console.log(result)
-    return result
-  }
 })
+
+// 計算前轉換運算子為字串
+function operatorTransfer() {
+  switch (inputList[1]) {
+    case '+':
+      return 'plus'
+      break
+    case '-':
+      return 'minus'
+      break
+    case '*':
+      return 'multiply'
+      break
+    case '/':
+      return 'divide'
+      break
+    default:
+      return 'error!'
+  }
+}
+
+//計算及API請求
+function calculation() {
+  console.log('do calculation')
+  let num1 = Number(inputList[0])
+  let operator = operatorTransfer()
+  let num2 = Number(inputList[2])
+  console.log(`http://localhost:5000/${operator}?num1=${num1}&num2=${num2}`)
+
+  axios
+    .get(`http://localhost:5000/${operator}?num1=${num1}&num2=${num2}`)
+    .then(function (response) {
+      console.log(response)
+      console.log(response.data)
+    })
+    .catch(function (error) {
+      console.log(error)
+    })
+}
+
+//   function calculation() {
+//     console.log('do calculation')
+//     if (inputList[1] === '+') {
+//       result = Number(inputList[0]) + Number(inputList[2])
+//     }
+//     if (inputList[1] === '-') {
+//       result = Number(inputList[0]) - Number(inputList[2])
+//     }
+//     if (inputList[1] === '*') {
+//       result = Number(inputList[0]) * Number(inputList[2])
+//     }
+//     if (inputList[1] === '/') {
+//       result = Number(inputList[0]) / Number(inputList[2])
+//     }
+//     console.log(result)
+//     return result
+//   }
+// })
