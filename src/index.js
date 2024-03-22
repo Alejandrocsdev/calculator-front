@@ -11,7 +11,7 @@ const calculationResult = document.querySelector('.calculationResult')
 let inputList = []
 
 //監聽整個鍵盤，紀錄按下按鈕的值，當湊滿運算式三個值，便執行算數
-numberPad.addEventListener('click', function numberPadClicked(event) {
+numberPad.addEventListener('click', async function numberPadClicked(event) {
   //按下按鈕的值
   let itemClicked = event.target.textContent.trim()
   console.log(itemClicked)
@@ -22,7 +22,7 @@ numberPad.addEventListener('click', function numberPadClicked(event) {
     if (!isNaN(itemClicked)) {
       console.log('是數字:', itemClicked)
       inputList[0] = itemClicked
-      console.log('更新之inputList:', inputList)
+      console.log('數字1_更新之inputList:', inputList)
       calculationInput.textContent = inputList[0]
     }
   }
@@ -32,7 +32,7 @@ numberPad.addEventListener('click', function numberPadClicked(event) {
     if (!isNaN(itemClicked)) {
       console.log('是數字:', itemClicked)
       inputList[0] = inputList[0] + itemClicked
-      console.log('更新之inputList:', inputList)
+      console.log('數字1_更新之inputList:', inputList)
       calculationInput.textContent = inputList[0]
     } else if (
       itemClicked === '+' ||
@@ -42,7 +42,7 @@ numberPad.addEventListener('click', function numberPadClicked(event) {
     ) {
       console.log('是運算子:', itemClicked)
       inputList[1] = itemClicked
-      console.log('更新之inputList:', inputList)
+      console.log('數字1+/_更新之inputList:', inputList)
       calculationInput.textContent = `${inputList[0]} ${inputList[1]}`
     }
   }
@@ -54,8 +54,8 @@ numberPad.addEventListener('click', function numberPadClicked(event) {
       inputList[2] = itemClicked
       console.log('更新之inputList:', inputList)
       calculationInput.textContent = `${inputList[0]} ${inputList[1]} ${inputList[2]}`
-      calculation()
-      calculationResult.textContent = calculation()
+      const result = await calculation() //●
+      calculationResult.textContent = result //●
     } else if (
       itemClicked === '+' ||
       itemClicked === '-' ||
@@ -64,7 +64,7 @@ numberPad.addEventListener('click', function numberPadClicked(event) {
     ) {
       console.log('是運算子:', itemClicked)
       inputList[1] = itemClicked
-      console.log('更新之inputList:', inputList)
+      console.log('數字1+/更新之inputList:', inputList)
       calculationInput.textContent = `${inputList[0]} ${inputList[1]}`
     }
   }
@@ -76,8 +76,8 @@ numberPad.addEventListener('click', function numberPadClicked(event) {
       inputList[2] = inputList[2] + itemClicked
       console.log('更新之inputList:', inputList)
       calculationInput.textContent = `${inputList[0]} ${inputList[1]} ${inputList[2]}`
-      calculation()
-      calculationResult.textContent = calculation()
+      const result = await calculation() //●
+      calculationResult.textContent = result //●
     } else if (
       itemClicked === '+' ||
       itemClicked === '-' ||
@@ -85,7 +85,8 @@ numberPad.addEventListener('click', function numberPadClicked(event) {
       itemClicked === '/'
     ) {
       console.log('是運算子:', itemClicked)
-      inputList[0] = calculation()
+      const result = await calculation() //●
+      inputList[0] = result //●
       inputList[1] = itemClicked
       inputList.pop()
       console.log('更新之inputList:', inputList)
@@ -93,10 +94,11 @@ numberPad.addEventListener('click', function numberPadClicked(event) {
       calculationResult.textContent = ''
     } else if (itemClicked === '=') {
       console.log('是送出結果:', itemClicked)
-      inputList[0] = calculation()
+      const result = await calculation() //●
+      inputList[0] = result
       inputList.pop()
       inputList.pop()
-      console.log('更新之inputList:', inputList)
+      console.log('= 更新之inputList:', inputList)
       calculationInput.textContent = `${inputList[0]}`
       calculationResult.textContent = ''
     }
@@ -123,40 +125,21 @@ function operatorTransfer() {
   }
 }
 
-//計算及API請求
-function calculation() {
-  console.log('do calculation')
-  let num1 = Number(inputList[0])
-  let operator = operatorTransfer()
-  let num2 = Number(inputList[2])
-  console.log(`http://localhost:5000/${operator}?num1=${num1}&num2=${num2}`)
+async function calculation() {
+  try {
+    console.log('do calculation')
+    let v1 = Number(inputList[0])
+    let operator = operatorTransfer()
+    let v2 = Number(inputList[2])
+    console.log(`http://localhost:5000/${operator}?v1=${v1}&v2=${v2}`)
 
-  axios
-    .get(`http://localhost:5000/${operator}?num1=${num1}&num2=${num2}`)
-    .then(function (response) {
-      console.log(response)
-      console.log(response.data)
-    })
-    .catch(function (error) {
-      console.log(error)
-    })
+    const response = await axios.get(
+      `http://localhost:5000/${operator}?v1=${v1}&v2=${v2}`
+    )
+    console.log(response.data.answer)
+    return response.data.answer
+  } catch (error) {
+    console.log(error)
+    throw error
+  }
 }
-
-//   function calculation() {
-//     console.log('do calculation')
-//     if (inputList[1] === '+') {
-//       result = Number(inputList[0]) + Number(inputList[2])
-//     }
-//     if (inputList[1] === '-') {
-//       result = Number(inputList[0]) - Number(inputList[2])
-//     }
-//     if (inputList[1] === '*') {
-//       result = Number(inputList[0]) * Number(inputList[2])
-//     }
-//     if (inputList[1] === '/') {
-//       result = Number(inputList[0]) / Number(inputList[2])
-//     }
-//     console.log(result)
-//     return result
-//   }
-// })
