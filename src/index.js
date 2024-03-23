@@ -120,3 +120,44 @@ async function calculation(inputList) {
     throw error
   }
 }
+
+function formula(str) {
+  const plusRemoved = str.split('+')
+  const minusRemoved = []
+  plusRemoved.forEach((part) => {
+    const seperated = part.split('-')
+    if (seperated.length > 1) {
+      for (let i = 1; i < seperated.length; i += 2) {
+        seperated.splice(i, 0, '(-1)')
+      }
+    }
+    minusRemoved.push(...seperated)
+  })
+  let total = 0
+  let isSubtract = false
+
+  minusRemoved.forEach((part) => {
+    if (part === '(-1)') {
+      isSubtract = true
+    } else {
+      const separated = part.match(/\d+|\D/g)
+      let result = Number(separated[0])
+      for (let i = 1; i < separated.length; i += 2) {
+        const operator = separated[i]
+        const num = Number(separated[i + 1])
+        if (operator === '*') {
+          result *= num
+        } else if (operator === '/') {
+          result /= num
+        }
+      }
+      if (isSubtract) {
+        total -= result
+        isSubtract = false
+      } else {
+        total += result
+      }
+    }
+  })
+  return total
+}
