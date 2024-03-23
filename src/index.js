@@ -12,7 +12,7 @@ numberPad.addEventListener('click', async (event) => {
     if (target.classList.contains('delete')) {
       // input歸零
       input.innerText = '0'
-    } 
+    }
     // 退格鍵
     else if (target.classList.contains('backspace')) {
       if (input.innerText.length > 1) {
@@ -22,12 +22,17 @@ numberPad.addEventListener('click', async (event) => {
         // 個位數即歸零
         input.innerText = '0'
       }
-    } 
+    }
     // 等於鍵
     else if (target.classList.contains('equal')) {
       if (!isNaN(input.innerText)) {
         // 如input沒有運算子,input直接進入result
         result.innerText = input.innerText
+        // input歸零
+        input.innerText = 0
+      } else if (isNaN(input.innerText.slice(-1))) {
+        input.innerText = input.innerText
+        window.alert('運算子必須搭配數字')
       } else {
         // 如input有運算子:
         let operator = ''
@@ -43,11 +48,16 @@ numberPad.addEventListener('click', async (event) => {
         // operator轉換成request path推至inputList[供calculation()計算用]
         inputList.push(operatorTransfer(operator))
         // result顯示答案
-        result.innerText = await calculation(inputList)
+        if ((await calculation(inputList)) !== null) {
+          result.innerText = await calculation(inputList)
+          // input歸零
+          input.innerText = 0
+        } else {
+          input.innerText = input.innerText
+          window.alert('除數不可為0')
+        }
       }
-      // input歸零
-      input.innerText = 0
-    } 
+    }
     // 數字 & 運算子
     else {
       if (input.innerText === '0') {
