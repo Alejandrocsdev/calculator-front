@@ -31,31 +31,16 @@ numberPad.addEventListener('click', async (event) => {
         // input歸零
         input.innerText = 0
       } else if (isNaN(input.innerText.slice(-1))) {
-        input.innerText = input.innerText
         window.alert('運算子必須搭配數字')
+      } else if (input.innerText.includes('/0')) {
+        window.alert('除數不可為0')
       } else {
-        // 如input有運算子:
-        let operator = ''
-        // (1)找到運算子並宣告至operator變數
-        for (let i = 0; i < input.innerText.length; i++) {
-          if (isNaN(input.innerText[i])) {
-            operator = input.innerText[i]
-            break
-          }
-        }
-        // 使用split將operator左右數值變成陣列
-        const inputList = input.innerText.split(operator)
-        // operator轉換成request path推至inputList[供calculation()計算用]
-        inputList.push(operatorTransfer(operator))
-        // result顯示答案
-        if ((await calculation(inputList)) !== null) {
-          result.innerText = await calculation(inputList)
-          // input歸零
-          input.innerText = 0
-        } else {
-          input.innerText = input.innerText
-          window.alert('除數不可為0')
-        }
+        const encoded = encodeURIComponent(input.innerText)
+        axios.get(`${BASE_URL}formula?value=${encoded}`).then((response) => {
+          const data = response.data
+          const answer = data.answer
+          result.innerText = answer
+        })
       }
     }
     // 數字 & 運算子
@@ -83,81 +68,3 @@ numberPad.addEventListener('click', async (event) => {
     }
   }
 })
-
-// operator => request path
-function operatorTransfer(operator) {
-  switch (operator) {
-    case '+':
-      return 'plus'
-      break
-    case '-':
-      return 'minus'
-      break
-    case '*':
-      return 'multiply'
-      break
-    case '/':
-      return 'divide'
-      break
-    default:
-      return 'error!'
-  }
-}
-
-async function calculation(inputList) {
-  try {
-    console.log('do calculation')
-    let v1 = Number(inputList[0])
-    let operator = inputList[2]
-    let v2 = Number(inputList[1])
-    console.log(`${BASE_URL}${operator}?v1=${v1}&v2=${v2}`)
-
-    const response = await axios.get(`${BASE_URL}${operator}?v1=${v1}&v2=${v2}`)
-    console.log(response.data.answer)
-    return response.data.answer
-  } catch (error) {
-    console.log(error)
-    throw error
-  }
-}
-
-function formula(str) {
-  const plusRemoved = str.split('+')
-  const minusRemoved = []
-  plusRemoved.forEach((part) => {
-    const seperated = part.split('-')
-    if (seperated.length > 1) {
-      for (let i = 1; i < seperated.length; i += 2) {
-        seperated.splice(i, 0, '(-1)')
-      }
-    }
-    minusRemoved.push(...seperated)
-  })
-  let total = 0
-  let isSubtract = false
-
-  minusRemoved.forEach((part) => {
-    if (part === '(-1)') {
-      isSubtract = true
-    } else {
-      const separated = part.match(/\d+|\D/g)
-      let result = Number(separated[0])
-      for (let i = 1; i < separated.length; i += 2) {
-        const operator = separated[i]
-        const num = Number(separated[i + 1])
-        if (operator === '*') {
-          result *= num
-        } else if (operator === '/') {
-          result /= num
-        }
-      }
-      if (isSubtract) {
-        total -= result
-        isSubtract = false
-      } else {
-        total += result
-      }
-    }
-  })
-  return total
-}
